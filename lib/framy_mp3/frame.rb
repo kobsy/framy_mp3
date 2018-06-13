@@ -219,5 +219,39 @@ module FramyMP3
       data.unpack("C40")[-4, 4].pack("C4") == "VBRI"
     end
 
+    def to_xing_header(total_frames:, total_bytes:)
+      # Make a shallow copy
+      xing_frame = dup
+
+      # Make a new zeroed-out data slice
+      xing_frame.data = ([ 0 ] * length).pack("C")
+      StringIO.open(xing_frame.data, "r+b") do |xing_data|
+        # Copy over the frame header
+        xing_data.write header
+
+        # Determine the Xing header offset
+        offset = 4 + side_information_size
+
+        # Write the Xing header ID
+        xing_data.seek(offset, IO::SEEK_SET)
+        xing_data.write "Xing"
+
+        # Write a flag indicating that the number-of-frames and number-of-bytes
+        # fields are present
+        xing_data.seek(offset + 7, IO::SEEK_SET)
+        xing_data.write [ 3 ].pack("C")
+
+        # Write the number of frames as a 32-bit big endian unsigned integer
+        xing_data.seek(offset + 8, IO::SEEK_SET)
+        xing_data.write [ total_frames ].pack("N")
+
+        # Write the number of bytes as a 32-bit big endian unsigned integer
+        xing_data.seek(offset + 12, IO::SEEK_SET)
+        xing_data.write [ total_bytes ].pack("N")
+      end
+
+      xing_frame
+    end
+
   end
 end
