@@ -16,6 +16,50 @@ module FramyMP3
       end
     end
 
+    def to_blob(options={})
+      blob = ""
+
+      keep_xing_headers = vbr? ? false : options.fetch(:keep_xing_headers, false)
+
+      StringIO.open(blob, "wb") do |outfile|
+        initial_tag = id3v2_tag
+        outfile << initial_tag.data unless initial_tag.nil?
+        outfile << xing_header.data unless keep_xing_headers
+        (keep_xing_headers ? frames : frames.reject(&:xing_header?)).each do |frame|
+          outfile << frame.data
+        end
+        closing_tag = id3v1_tag
+        outfile << closing_tag.data unless closing_tag.nil?
+      end
+
+      blob
+    end
+    alias to_s to_blob
+
+    def variable_bitrate?
+      initial_bitrate = frames.first.bitrate
+      frames[1..-1].any? do |frame|
+        frame.bitrate != initial_bitrate
+      end
+    end
+    alias vbr? variable_bitrate?
+
+    def id3v2_tag
+      tags.find(&:v2?)
+    end
+
+    def id3v1_tag
+      tags.find(&:v1?)
+    end
+
+    def total_frames
+      frames.count
+    end
+
+    def total_frame_bytes
+      frames.map { |frame| frame.data.bytesize }.sum
+    end
+
   private
     attr_reader :stream
 
@@ -85,6 +129,10 @@ module FramyMP3
         return if next_byte.nil?
         buffer << next_byte
       end
+    end
+
+    def xing_header
+      frames.first&.to_xing_header(total_frames: total_frames, total_bytes: total_frame_bytes)
     end
 
   end
