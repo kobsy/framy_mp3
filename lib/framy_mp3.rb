@@ -1,5 +1,7 @@
 require "framy_mp3/version"
+require "framy_mp3/frame"
+require "framy_mp3/id3_tag"
+require "framy_mp3/file"
 
-module FramyMp3
-  # Your code goes here...
+module FramyMP3
 end
