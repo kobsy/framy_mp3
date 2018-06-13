@@ -3,7 +3,7 @@ require "framy_mp3/id3_tag"
 
 module FramyMP3
   class File
-    attr_reader :stream, :frames, :tags
+    attr_reader :frames, :tags
 
     def initialize(stream)
       @stream = stream
@@ -17,6 +17,7 @@ module FramyMP3
     end
 
   private
+    attr_reader :stream
 
     def next_frame
       while (object = next_object)
