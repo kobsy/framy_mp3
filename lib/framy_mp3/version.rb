@@ -1,3 +1,4 @@
-module FramyMp3
-  VERSION = "0.1.0"
+module FramyMP3
+  VERSION = "0.1.0".freeze
+
 end
