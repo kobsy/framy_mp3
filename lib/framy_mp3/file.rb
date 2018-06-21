@@ -36,6 +36,13 @@ module FramyMP3
     end
     alias to_s to_blob
 
+    def dup
+      super.tap do |new_file|
+        new_file.instance_variable_set :@frames, frames.map(&:dup)
+        new_file.instance_variable_set :@tags, tags.map(&:dup)
+      end
+    end
+
     def variable_bitrate?
       initial_bitrate = frames.first.bitrate
       frames[1..-1].any? do |frame|
@@ -125,7 +132,7 @@ module FramyMP3
 
         # Nothing found. Shift the buffer forward by one byte and try again.
         buffer.shift
-        next_byte = stream.read(1)&.unpack("C")
+        next_byte = stream.read(1)&.unpack("C")&.first
         return if next_byte.nil?
         buffer << next_byte
       end

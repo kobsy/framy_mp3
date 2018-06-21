@@ -227,7 +227,7 @@ module FramyMP3
       xing_frame.data = ([ 0 ] * length).pack("C")
       StringIO.open(xing_frame.data, "r+b") do |xing_data|
         # Copy over the frame header
-        xing_data.write header
+        xing_data.write header.pack("C4")
 
         # Determine the Xing header offset
         offset = 4 + side_information_size
