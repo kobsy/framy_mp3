@@ -1,2 +1,9 @@
+require "rspec/core/rake_task"
 require "bundler/gem_tasks"
-task :default => :spec
+
+RSpec::Core::RakeTask.new(:spec) do |task|
+  task.rspec_opts = %w{--color --format documentation}
+end
+
+task default: :spec
+task test: :spec
