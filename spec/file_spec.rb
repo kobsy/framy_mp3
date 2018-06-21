@@ -54,4 +54,14 @@ describe FramyMP3::File do
       expect(new_file.frames.map(&:data)).to include(xing_header_data.first)
     end
   end
+
+  context "#dup" do
+    it "should produce a duplicate file with independent tags and frames arrays" do
+      new_file = file.dup
+      new_file.frames << new_file.frames.first.dup
+      expect(file.frames.count).not_to eq(new_file.frames.count)
+      new_file.tags << new_file.tags.first.dup
+      expect(file.tags.count).not_to eq(new_file.tags.count)
+    end
+  end
 end
