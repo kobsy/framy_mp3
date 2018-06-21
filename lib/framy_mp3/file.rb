@@ -125,7 +125,7 @@ module FramyMP3
 
         # Nothing found. Shift the buffer forward by one byte and try again.
         buffer.shift
-        next_byte = stream.read(1)&.unpack("C")
+        next_byte = stream.read(1)&.unpack("C")&.first
         return if next_byte.nil?
         buffer << next_byte
       end
